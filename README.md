@@ -4,7 +4,7 @@
 GenreSniffer is a web-based machine learning application that predicts the genre of a song or audio snippet using textual input features. It uses NLP techniques and a trained classification model to identify genres from song-related data.
 Here’s how the GenreSniffer web interface looks:
 
-![Home Page](images.png)
+![Home Page](https://github.com/Hamizkhan08/Genresniffer/blob/main/image.png)
 ## 🗂 Project Structure
 
 ```
