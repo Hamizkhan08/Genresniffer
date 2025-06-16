@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_name or 'Genre AI' }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Style for the new footer -->
+    <style>
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+        .site-footer {
+            margin-top: auto; /* Pushes the footer to the bottom */
+            padding: 40px 20px 20px 20px;
+            text-align: center;
+            color: #a7a7a7;
+            font-size: 0.9em;
+            border-top: 1px solid #282828; /* Subtle separator */
+        }
+        .site-footer a {
+            color: #b3b3b3;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 8px;
+            transition: color 0.2s ease-in-out;
+        }
+        .site-footer a:hover {
+            color: #ffffff;
+        }
+        .site-footer .fa-github {
+            font-size: 1.3rem;
+            vertical-align: -0.2em; /* Aligns icon nicely with text */
+        }
+    </style>
+</head>
+<body>
+    <div class="spotify-layout">
+        <!-- HTML layout is unchanged -->
+        <nav class="left-sidebar">
+            <div class="logo"><i class="fa-solid fa-music"></i></div>
+            <ul><li class="active"><a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a></li></ul>
+        </nav>
+        <aside class="main-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> History</h3>
+                    <button id="clear-history-btn" title="Clear History">Clear</button>
+                </div>
+                <ul id="history-list"></ul>
+            </div>
+            <div class="sidebar-section instructions">
+                <div class="sidebar-header">
+                    <h3><i class="fa-solid fa-circle-info"></i> How to Use</h3>
+                </div>
+                <ol class="instructions-list">
+                    <li>Paste song lyrics into the text box.</li>
+                    <li>Click "Predict Genre" to see the AI's analysis.</li>
+                    <li>View the top prediction and other likely genres.</li>
+                    <li>Use the 👍/👎 icons to give feedback and help the AI learn!</li>
+                </ol>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1>{{ project_name }}</h1>
+                <p class="subtitle">Paste lyrics to discover the genre and find similar music.</p>
+            </header>
+            <section class="input-section">
+                <form method="post" action="/predict" id="lyrics-form">
+                    <div class="textarea-container">
+                        <textarea name="lyrics" id="lyrics-textarea" rows="10" placeholder="They call me the hunter, that's my name..." required>{{ lyrics_input }}</textarea>
+                        <button type="button" id="clear-text-btn" title="Clear Text">×</button>
+                    </div>
+                    <div class="form-actions">
+                         <button type="submit" class="btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Predict Genre</button>
+                    </div>
+                </form>
+                <div id="loading" class="hidden"><div class="spinner"></div><p>Processing...</p></div>
+            </section>
+            {% if top_genres %}
+            <section id="results-section">
+                {% if identify_song_google_link %}
+                <div class="identified-song-card">
+                    <div class="search-details">
+                        <span class="card-label">Identify Original Song</span>
+                        <p>Search for the lyrics you entered on Google.</p>
+                    </div>
+                    <a href="{{ identify_song_google_link }}" target="_blank" class="google-link"><i class="fa-brands fa-google"></i> Find on Google</a>
+                </div>
+                {% endif %}
+                <div class="prediction-card">
+                    <div class="main-prediction">
+                        <span class="card-label">Top Predicted Genre</span>
+                        <div class="genre-and-feedback">
+                            <h2 id="predicted-genre-text">{{ top_genres[0].genre }}</h2>
+                            <div class="feedback-icons" id="feedback-initial-icons">
+                                <i class="far fa-thumbs-up" id="thumb-up" title="Prediction is correct"></i>
+                                <i class="far fa-thumbs-down" id="thumb-down" title="Prediction is incorrect"></i>
+                            </div>
+                        </div>
+                        <p>{{ "%.0f"|format(top_genres[0].probability * 100) }}% Confidence</p>
+                        <form id="feedback-form" class="hidden">
+                             <input type="hidden" name="lyrics_for_feedback" value="{{ lyrics_input }}">
+                             <input type="hidden" name="predicted_genre" value="{{ top_genres[0].genre }}">
+                             <label for="genre-select">What's the right genre?</label>
+                             <div class="feedback-controls">
+                                 <select name="corrected_genre" id="genre-select">
+                                     {% for genre in all_genres %}
+                                         <option value="{{ genre }}">{{ genre }}</option>
+                                     {% endfor %}
+                                 </select>
+                                 <button type="submit" class="btn-secondary">Submit</button>
+                             </div>
+                        </form>
+                        <p id="feedback-thanks" class="hidden">Thanks for your feedback!</p>
+                    </div>
+                    <div class="probability-bars">
+                        <span class="card-label">Other Possibilities</span>
+                        {% for genre in top_genres[1:] %}
+                        <div class="bar-item">
+                            <span class="bar-label">{{ genre.genre }}</span>
+                            <div class="bar-container">
+                                <div class="bar" style="width: {{ genre.probability * 100 }}%;"></div>
+                            </div>
+                            <span class="bar-value">{{"%.0f"|format(genre.probability * 100)}}%</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Added Footer -->
+            <footer class="site-footer">
+                Developed by HAMIZ KHAN
+                <a href="https://github.com/Hamizkhan08" target="_blank" rel="noopener noreferrer" title="View on GitHub">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+            </footer>
+            <!-- End of Footer -->
+
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Constants and Global Variables ---
+    const HISTORY_KEY = 'genreSnifferHistoryV1';
+    const lyricsForm = document.getElementById('lyrics-form');
+    const loadingDiv = document.getElementById('loading');
+    const formActions = document.querySelector('.form-actions');
+    const historyList = document.getElementById('history-list');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const lyricsTextarea = document.getElementById('lyrics-textarea');
+    const clearTextBtn = document.getElementById('clear-text-btn');
+
+    // --- History Functions ---
+    const getHistory = () => JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    const saveHistory = (history) => localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    const renderHistory = () => {
+        historyList.innerHTML = '';
+        const history = getHistory();
+        if (history.length === 0) {
+            historyList.innerHTML = '<li class="history-empty">No predictions yet.</li>';
+            return;
+        }
+        history.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'history-item';
+            li.innerHTML = `<span class="history-genre">${item.genre}</span><p class="history-lyrics">"${item.lyrics.substring(0, 80)}..."</p>`;
+            li.addEventListener('click', () => { lyricsTextarea.value = item.lyrics; });
+            historyList.appendChild(li);
+        });
+    };
+
+    // --- Event Listeners ---
+    // This listener only handles showing the loading spinner on submit.
+    lyricsForm.addEventListener('submit', function() {
+        if (lyricsTextarea.value.trim() === '') return;
+        loadingDiv.classList.remove('hidden');
+        formActions.classList.add('hidden');
+    });
+
+    clearTextBtn.addEventListener('click', () => { lyricsTextarea.value = ''; lyricsTextarea.focus(); });
+    clearHistoryBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all history?')) {
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+        }
+    });
+
+    // --- Logic that runs on page load ---
+    
+    // Always render history from storage when the page loads.
+    renderHistory();
+
+    // CORRECTED LOGIC: This block now runs ONLY when the page loads with results.
+    // The Jinja `if` condition is rendered by the server.
+    {% if top_genres %}
+        // 1. Create the new history item from the data passed by Flask.
+        const newHistoryItem = { genre: '{{ top_genres[0].genre }}', lyrics: {{ lyrics_input | tojson }} };
+        
+        // 2. Get the current history, add the new item, and save it back.
+        let history = getHistory();
+        history = history.filter(item => item.lyrics !== newHistoryItem.lyrics); // Prevent duplicates
+        history.unshift(newHistoryItem); // Add to the top
+        if (history.length > 15) history.pop(); // Limit history size
+        saveHistory(history);
+        
+        // 3. Re-render the history list in the sidebar to show the new item immediately.
+        renderHistory();
+    {% endif %}
+
+    // --- Feedback Logic (runs only if results are on the page) ---
+    const thumbUp = document.getElementById('thumb-up');
+    const thumbDown = document.getElementById('thumb-down');
+    const feedbackForm = document.getElementById('feedback-form');
+    const initialIcons = document.getElementById('feedback-initial-icons');
+    const thanksMessage = document.getElementById('feedback-thanks');
+
+    if (thumbUp) {
+        thumbUp.addEventListener('click', () => {
+            const formData = new FormData();
+            formData.append('lyrics_for_feedback', feedbackForm.querySelector('[name=lyrics_for_feedback]').value);
+            formData.append('predicted_genre', feedbackForm.querySelector('[name=predicted_genre]').value);
+            formData.append('is_correct', 'true');
+            fetch('/feedback', { method: 'POST', body: formData });
+            initialIcons.classList.add('hidden');
+            thanksMessage.classList.remove('hidden');
+        });
+    }
+
+    if (thumbDown) {
+        thumbDown.addEventListener('click', () => {
+            feedbackForm.classList.remove('hidden');
+            initialIcons.classList.add('hidden');
+        });
+    }
+
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(feedbackForm);
+formData.append('is_correct', 'false');
+            fetch('/feedback', { method: 'POST', body: formData });
+            feedbackForm.classList.add('hidden');
+            thanksMessage.classList.remove('hidden');
+        });
+    }
+});
+</script>
+</body>
+</html>
