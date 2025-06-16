@@ -1,8 +1,4 @@
-Thanks! I’ve reviewed your project files. Here's a tailored `README.md` file based on the actual contents of your project:
 
----
-
-```markdown
 # 🎧 GenreSniffer
 
 GenreSniffer is a web-based machine learning application that predicts the genre of a song or audio snippet using textual input features. It uses NLP techniques and a trained classification model to identify genres from song-related data.
@@ -112,7 +108,7 @@ This project is for educational use. Feel free to fork and modify.
 
 ## 👤 Author
 
-* Your Name – [LinkedIn](https://linkedin.com) | [GitHub](https://github.com)
+* Hamiz Khan 
 
 ```
 
