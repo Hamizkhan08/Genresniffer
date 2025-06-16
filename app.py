@@ -13,12 +13,19 @@ from nltk.tokenize import word_tokenize
 from urllib.parse import quote_plus
 
 # --- One-time setup ---
-try:
-    nltk.data.find('tokenizers/punkt')
-    nltk.data.find('corpora/stopwords')
-except nltk.downloader.DownloadError:
-    nltk.download('punkt')
-    nltk.download('stopwords')
+def download_nltk_data():
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
+    
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
+
+download_nltk_data()
+
 
 # 2. FLASK APP INITIALIZATION
 app = Flask(__name__)
