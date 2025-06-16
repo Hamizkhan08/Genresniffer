@@ -32,15 +32,6 @@ Genresniffer-main/
 └── runtime.txt               # Runtime specification for deployment
 
 ````
-
-## 🖼️ Screenshot
-
-Here’s how the GenreSniffer web interface looks:
-
-![App Interface](images/screenshot_home.png)
-
-> 💡 Place your screenshot at: `Genresniffer-main/images/screenshot_home.png`
-
 ## 🚀 Features
 
 - Genre prediction from textual input (e.g., lyrics, metadata)
