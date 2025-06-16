@@ -53,7 +53,7 @@ Here’s how the GenreSniffer web interface looks:
    ```bash
    git clone https://github.com/your-username/Genresniffer.git
    cd Genresniffer-main
-````
+   ```
 
 2. **Create a virtual environment** (optional but recommended):
 
@@ -115,11 +115,3 @@ This project is for educational use. Feel free to fork and modify.
 
 * Hamiz Khan
 
-```
-
----
-
-✅ Just make sure to create a folder named `images/` inside your project and place your screenshot there as `screenshot_home.png`. Rename as needed.
-
-Let me know if you'd like this in PDF or HTML too!
-```
