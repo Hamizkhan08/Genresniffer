@@ -29,7 +29,7 @@ Genresniffer-main/
 ├── requirements.txt         # List of Python dependencies
 └── runtime.txt              # Runtime specification for deployment
 
-````
+
 
 ## 🚀 Features
 
@@ -45,20 +45,20 @@ Genresniffer-main/
    ```bash
    git clone https://github.com/your-username/Genresniffer.git
    cd Genresniffer-main
-````
+
 
 2. **Create a virtual environment** (optional but recommended):
 
    ```bash
    python -m venv venv
    source venv/bin/activate   # On Windows: venv\Scripts\activate
-   ```
+
 
 3. **Install the dependencies**:
 
    ```bash
    pip install -r requirements.txt
-   ```
+
 
 ## 💻 Usage
 
@@ -66,13 +66,12 @@ Genresniffer-main/
 
    ```bash
    python app.py
-   ```
 
 2. **Open in browser**:
 
-   ```
+ 
    http://127.0.0.1:5000
-   ```
+
 
 3. **Input song-related text** (e.g., title, artist, lyrics, description) and get the predicted genre instantly.
 
@@ -82,7 +81,7 @@ To retrain the model on your own data:
 
 ```bash
 python train_model.py
-```
+
 
 Make sure your input CSV is formatted appropriately and update paths if needed.
 
@@ -110,9 +109,7 @@ This project is for educational use. Feel free to fork and modify.
 
 * Hamiz Khan 
 
-```
 
----
 
 Let me know if you'd like me to:
 - Add example input/output
